@@ -1,76 +1,114 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { ArticleComponent } from '../article/article.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Component, Inject, OnInit, PLATFORM_ID, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { DataService } from '../services/data.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { isPlatformBrowser } from '@angular/common';
-
-interface BudgetItem {
-  title: string;
-  budget: number;
-}
+import { ArticleComponent } from '../article/article.component';
+import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'pb-homepage',
   standalone: true,
-  imports: [ArticleComponent, HttpClientModule],
   templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.scss']
+  styleUrls: ['./homepage.component.scss'],
+  imports: [CommonModule, ArticleComponent, BreadcrumbsComponent],
 })
-export class HomepageComponent implements OnInit {
-  public dataSource = {
+export class HomepageComponent implements OnInit, AfterViewInit {
+  public dataSource: {
+    datasets: { data: number[]; backgroundColor: string[] }[];
+    labels: string[];
+  } = {
     datasets: [
       {
-        data: [] as number[],
-        backgroundColor: [
-          '#ffcd56',
-          '#ff6384',
-          '#36a2eb',
-          '#fd6b19',
-        ]
+        data: [],
+        backgroundColor: ['#ffcd56', '#ff6384', '#36a2eb', '#fd6b19']
       }
     ],
-    labels: [] as string[]
+    labels: [] // ✅ Explicitly set type as `string[]`
   };
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: object) {
+
+  @ViewChild('myChartCanvas', { static: false }) chartCanvas!: ElementRef<HTMLCanvasElement>;
+
+  constructor(
+    private dataService: DataService,
+    @Inject(PLATFORM_ID) private platformId: object,
+    private cdr: ChangeDetectorRef
+  ) {
     Chart.register(...registerables);
   }
 
   ngOnInit(): void {
-    this.http.get<{ myBudget: BudgetItem[] }>('http://localhost:3000/budget')
-      .subscribe({
-        next: (res) => {
-          res.myBudget.forEach((item, i) => {
-            this.dataSource.datasets[0].data[i] = item.budget;
-            this.dataSource.labels[i] = item.title;
-          });
+    console.log("📡 HomepageComponent Initialized!");
 
-          if (isPlatformBrowser(this.platformId)) {
-            this.createChart();
-          }
-        },
-        error: (err) => {
-          console.error('Error fetching budget:', err);
-          alert('Failed to connect to the backend. Ensure the API is running.');
+    this.dataService.budgetData$.subscribe(budgetItems => {
+      console.log("🔥 Received Budget Data in Component:", budgetItems);
+
+      if (!budgetItems || budgetItems.length === 0) {
+        console.warn("⚠️ No budget data available. Please check your API connection.");
+        return;
+      }
+
+      this.dataSource.datasets[0].data = budgetItems.map(item => item.budget);
+      this.dataSource.labels = budgetItems.map(item => item.title as string);
+
+      console.log("✅ DataSource Updated:", JSON.stringify(this.dataSource, null, 2));
+
+      this.cdr.detectChanges(); // Ensure UI updates
+
+      setTimeout(() => {
+        if (isPlatformBrowser(this.platformId)) {
+          console.log("📊 Calling createChart() AFTER delay...");
+          this.createChart();
         }
-      });
+      }, 500);
+    });
+
+    this.dataService.fetchBudgetData().subscribe();
+  }
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      console.log("🔍 ngAfterViewInit - Checking if canvas exists:", this.chartCanvas);
+    }
   }
 
   createChart() {
     if (isPlatformBrowser(this.platformId)) {
-      const canvas = document.getElementById('myChart') as HTMLCanvasElement;
-      if (canvas) {
-        new Chart(canvas.getContext('2d')!, {
+      console.log("📊 Initializing Chart.js...");
+
+      if (!this.chartCanvas) {
+        console.error("❌ Chart canvas NOT FOUND in ViewChild! Ensure #myChartCanvas exists.");
+        return;
+      } else {
+        console.log("✅ Found Canvas Element in ViewChild:", this.chartCanvas);
+      }
+
+      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      console.log("🎨 Checking canvas context:", ctx);
+
+      if (!ctx) {
+        console.error('❌ Unable to get canvas context! The canvas may be hidden or not loaded.');
+        return;
+      }
+
+      console.log("📈 Creating new Chart.js instance...");
+      try {
+        new Chart(ctx, {
           type: 'pie',
           data: this.dataSource,
           options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            animation: { duration: 1000 }
           }
-        } as ChartConfiguration);
-      } else {
-        console.error('Canvas element not found');
+        });
+
+        console.log("✅ Chart successfully created!");
+      } catch (error) {
+        console.error("❌ Chart creation failed:", error);
       }
     }
   }
+
 }

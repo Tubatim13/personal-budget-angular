@@ -1,0 +1,15 @@
+.charts-wrapper {
+  display: flex; /* ✅ Ensure charts are visible */
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px; /* ✅ Ensure it doesn’t collapse */
+  border: 2px solid red; /* 🔥 Temporary border to check visibility */
+}
+
+.chart-box {
+  flex: 1;
+  padding: 10px;
+  min-width: 300px;
+  min-height: 400px; /* ✅ Ensure enough space */
+}

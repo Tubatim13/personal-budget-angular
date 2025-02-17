@@ -4,12 +4,14 @@ import { ArticleComponent } from './article/article.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { P404Component } from './p404/p404.component';
+import { ContactComponent } from './contact/contact.component';
 
 export const routes: Routes = [
   { path: '', component: HomepageComponent, pathMatch: 'full'}, // Default route
   { path: 'article', component: ArticleComponent }, // Article page
   { path: 'about', component: AboutComponent }, // About page
   { path: 'login', component: LoginComponent }, // Login page
+  { path: 'contact', component: ContactComponent }, //Contact page
   { path: '**', component: P404Component } // Error PAGE
 ];
 

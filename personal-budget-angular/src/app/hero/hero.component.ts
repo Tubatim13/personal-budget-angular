@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'pb-hero',
   standalone: true,
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './hero.component.html',
-  styleUrl: './hero.component.scss'
+  styleUrls: ['./hero.component.scss']
 })
-export class HeroComponent {
+export class HeroComponent { }
 
-}

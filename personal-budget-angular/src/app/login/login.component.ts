@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
+import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'pb-login',
   standalone: true,
-  imports: [],
+  imports: [BreadcrumbsComponent], // ✅ Import BreadcrumbsComponent
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
-
-}
+export class LoginComponent { }

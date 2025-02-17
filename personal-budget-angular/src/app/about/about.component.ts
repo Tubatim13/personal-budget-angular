@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
+import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'pb-about',
   standalone: true,
-  imports: [],
+  imports: [BreadcrumbsComponent],
   templateUrl: './about.component.html',
-  styleUrl: './about.component.scss'
+  styleUrls: ['./about.component.scss']
 })
-export class AboutComponent {
+export class AboutComponent { }
 
-}

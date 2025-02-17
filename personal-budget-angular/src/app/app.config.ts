@@ -1,10 +1,12 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { routes } from './app.routes'; // ✅ Import routes
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { routes } from './app.routes';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes) // ✅ Register routes
-  ]
+    provideRouter(routes, withComponentInputBinding()),
+    provideHttpClient(withFetch()), // ✅ Ensures Angular can fetch data
+  ],
 };
 

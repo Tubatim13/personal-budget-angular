@@ -1,6 +1,7 @@
 <main class="center" id="main">
+    <pb-breadcrumbs></pb-breadcrumbs>
 
-    <div class="page-area">
+    <section class="page-area">
 
         <pb-article>
           <h1>Stay on track</h1>
@@ -60,13 +61,26 @@
         </pb-article>
 
         <article>
-            <h1>Chart</h1>
-            <p>
-                <canvas id="myChart" width="400" height="400"></canvas>
-            </p>
+          <h2>Charts</h2>
+          <div class="charts-wrapper">
+            <div class="chart-box">
+              <p>📊 Chart Placeholder - Canvas should be below:</p>
+              <canvas #myChartCanvas
+                      id="myChart"
+                      width="400"
+                      height="400"
+                      aria-label="Budget distribution pie chart"
+                      role="img">
+              </canvas>
+              <p id="canvasError" style="color: red;">🚨 If you see this text, the canvas is missing!</p>
+            </div>
+            <div class="chart-box">
+              <div id="d3Chart"></div>
+            </div>
+          </div>
         </article>
 
-    </div>
+    </section>
 
 </main>
 
